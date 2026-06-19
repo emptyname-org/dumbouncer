@@ -1,4 +1,4 @@
-/* Dumbouncer — browser solver for the hashcash proof-of-work, challenge-on-submit.
+/* Dumbouncer - browser solver for the hashcash proof-of-work, challenge-on-submit.
    Flow: POST the form. If the server replies with a JSON challenge
    {challenge, sig, target}, search for an integer nonce such that the first
    4 bytes of SHA-256(challenge + ":" + nonce), as a big-endian integer, are
@@ -63,7 +63,7 @@
     statusTxt.style.color = color; statusTxt.style.display = "block"; statusTxt.innerText = msg;
   }
 
-  /* animated "Sending…" — cycles 0–3 trailing dots while the form is busy */
+  /* animated "Sending..." - cycles 0-3 trailing dots while the form is busy */
   var dotsTimer = null;
   function startDots(base, color) {
     stopDots();
@@ -100,7 +100,7 @@
     })();
   }
 
-  /* POST; allowSolve guards against looping if a fresh proof is still refused */
+  /* POST. allowSolve guards against looping if a fresh proof is still refused */
   function post(allowSolve) {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", ENDPOINT, true);
@@ -110,7 +110,7 @@
       var ch = null;
       try { var j = JSON.parse(txt); if (j && j.need_proof) ch = j; } catch (e) {}
       if (ch) {
-        if (!allowSolve) { done("Failed to send — please retry", "orange"); return; }
+        if (!allowSolve) { done("Failed to send - please retry", "orange"); return; }
         solve(ch, function () { post(false); });
         return;
       }

@@ -7,9 +7,9 @@
 
 Every sender must solve a configurable hashcash challenge before a message is accepted:
 
-- **Intelligent Agents** — the challenge states its own rules, so automated clients can solve it.
-- **Humans** — the browser solves it automatically; there is no CAPTCHA.
-- **Dumb bots** — clients that POST without running the challenge are rejected.
+- **Intelligent Agents** - the challenge states its own rules, so automated clients can solve it.
+- **Humans** - the browser solves it automatically. There is no CAPTCHA.
+- **Dumb bots** - clients that POST without running the challenge are rejected.
 
 Dumbouncer does not stop clients that intentionally run the solver. It adds a
 small, configurable, CPU cost to each accepted message.
@@ -52,7 +52,7 @@ Example challenge:
 ```
 
 The rules are included in the challenge response, so automated clients do not
-need to inspect the JavaScript — a browser (`script.js`) and an automated client
+need to inspect the JavaScript - a browser (`script.js`) and an automated client
 follow the same steps.
 
 ## Files
@@ -102,8 +102,8 @@ about `2^BITS` hashes to solve.
 | Bits | Expected hashes | Typical browser time |
 | ---: | ---: | ---: |
 | 18 | ~260k | ~0.2s |
-| 20 | ~1.0M | ~0.5–1s |
-| 22 | ~4.2M | ~2–4s |
+| 20 | ~1.0M | ~0.5-1s |
+| 22 | ~4.2M | ~2-4s |
 
 The solve is a random search, so the time is variable (geometric): median
 ~0.7×`2^BITS`, p99 ~4.6×`2^BITS`. Higher values increase cost for both users and
@@ -118,7 +118,7 @@ Dumbouncer checks each submission server-side, in O(1):
 - modified challenges fail the timing-safe HMAC verification
 - reused challenges are rejected (single-use)
 - expired challenges are rejected (older than `POW_WINDOW`)
-- client-sent difficulty values are ignored; difficulty is fixed server-side
+- client-sent difficulty values are ignored, and difficulty is fixed server-side
 - mail headers are sanitized against CR/LF injection
 
 Replay protection is file-backed (survives restarts) and pruned automatically.
@@ -133,4 +133,4 @@ WebCrypto.
 
 ## License
 
-CC0 1.0 Universal (public domain) — see [LICENSE](LICENSE).
+CC0 1.0 Universal (public domain) - see [LICENSE](LICENSE).

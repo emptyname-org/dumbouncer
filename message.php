@@ -1,16 +1,16 @@
 <?php
 /*
- * Dumbouncer — drop-in contact-form handler with a proof-of-work spam gate
- * (challenge-on-submit). Dumb bots bounce; humans and agents solve the proof.
+ * Dumbouncer - drop-in contact-form handler with a proof-of-work spam gate
+ * (challenge-on-submit). Dumb bots bounce. Humans and agents solve the proof.
  *
  * Single file: the hashcash helpers (issue / verify / single-use) are inlined at
- * the bottom — no other PHP to include. The browser solver is script.js.
+ * the bottom - no other PHP to include. The browser solver is script.js.
  *
  * Minimal install: drop this file next to your form, set POW_RECIPIENT below,
  * point the form's `action` at it. The HMAC secret is generated automatically on
- * the first request (see pow_secret()); nothing else is required.
+ * the first request (see pow_secret()). Nothing else is required.
  *
- * Protocol (no JavaScript required — the form's `action` is the only thing a
+ * Protocol (no JavaScript required - the form's `action` is the only thing a
  * client must discover):
  *   - A client POSTs the form.
  *   - If there is no valid proof yet, the server replies HTTP 200 with a JSON
@@ -31,28 +31,28 @@
  *   1 sent · 2 send-failed/misconfigured · 3 invalid email · 4 missing field
  */
 
-// ============================ CONFIG — edit this ============================
+// ============================ CONFIG - edit this ============================
 
-// REQUIRED — the one thing you must set.
+// REQUIRED - the one thing you must set.
 define('POW_RECIPIENT',  'you@example.com');                       // where messages go
 
-// COMMON — sensible defaults; change to taste.
+// COMMON - sensible defaults, change to taste.
 define('POW_FROM',       'Website contact <noreply@example.com>'); // envelope/From identity
 define('POW_SUBJECT',    '[contact] ');                            // subject prefix
 
-// DIFFICULTY — the one knob you tune. Number of leading zero bits required,
+// DIFFICULTY - the one knob you tune. Number of leading zero bits required,
 // i.e. ~2^POW_BITS hashes to solve. The browser solver adapts automatically
 // (it reads the target from the challenge), so you only ever change it here.
-//   18 ≈ 0.2s · 20 ≈ 0.5-1s (recommended) · 22 ≈ 2-4s   (median; p99 ~4.6x)
+//   18 ≈ 0.2s · 20 ≈ 0.5-1s (recommended) · 22 ≈ 2-4s   (median, p99 ~4.6x)
 define('POW_BITS',       20);
 
-// CHALLENGE LIFETIME — seconds a freshly issued challenge stays valid. It only
+// CHALLENGE LIFETIME - seconds a freshly issued challenge stays valid. It only
 // needs to cover the solve + round-trips (the challenge is minted at submit
 // time, not page load), so seconds, not minutes. Also bounds the single-use
 // cache: spent challenges are pruned POW_WINDOW seconds after issue.
 define('POW_WINDOW',     300);
 
-// ADVANCED — paths and limits. Defaults work as-is (files land next to this
+// ADVANCED - paths and limits. Defaults work as-is (files land next to this
 // script). The secret is auto-generated on first run if POW_SECRET_FILE is
 // missing. For production, point these OUTSIDE the web root, e.g.
 // __DIR__.'/../private/pow_secret', and the PHP user must read pow_secret and
@@ -99,7 +99,7 @@ if (isset($_GET['puzzle'])) {
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); header('Allow: POST'); exit; }
 
 // challenge-response: no valid proof (or a replayed one) -> hand back a fresh challenge.
-// pow_verify() checks the signature, freshness and the hash; pow_spend() then
+// pow_verify() checks the signature, freshness and the hash, then pow_spend()
 // enforces single use so a solved proof cannot be replayed within the window.
 if (!pow_verify(pval('challenge'), pval('sig'), pval('nonce')) || !pow_spend(pval('challenge'))) {
   header('Content-Type: application/json'); header('Cache-Control: no-store');
@@ -136,10 +136,10 @@ finish($ok ? '1' : '2', $ok ? 'sent' : 'mail-fail');
 // is one HMAC, verifying a solution is one SHA-256. No bignum, no extensions
 // beyond the always-available `hash` extension.
 
-/* The HMAC secret. Read from POW_SECRET_FILE; if that file is absent, generate
+/* The HMAC secret. Read from POW_SECRET_FILE. If that file is absent, generate
    a 256-bit secret and write it (0600) on first run, so a fresh install needs
    no `openssl` step. 'x' open mode makes creation atomic: concurrent first
-   requests can't clobber each other — the loser falls through and re-reads the
+   requests can't clobber each other - the loser falls through and re-reads the
    winner's secret. Pre-create the file yourself (outside the web root) to skip
    auto-generation entirely. Returns '' only if no secret exists and none can be
    written, which surfaces as a "misconfigured" 500. */
@@ -181,7 +181,7 @@ function pow_issue() {
   );
 }
 
-/* Verify a submitted (challenge, sig, nonce). One SHA-256 — microseconds.
+/* Verify a submitted (challenge, sig, nonce). One SHA-256 - microseconds.
    Checks: we signed this challenge (timing-safe), it is still fresh, and
    the first 4 bytes of SHA-256(challenge ":" nonce) are <= target. */
 function pow_verify($challenge, $sig, $nonce) {
@@ -201,7 +201,7 @@ function pow_verify($challenge, $sig, $nonce) {
    time it is seen, false on any later replay (within the freshness window).
    File-backed, locked, self-pruning. Fails OPEN (returns true) if the cache file
    is unwritable, so a permissions problem degrades to "no replay protection"
-   rather than breaking the form — see README. Call only AFTER pow_verify() passes. */
+   rather than breaking the form - see README. Call only AFTER pow_verify() passes. */
 function pow_spend($challenge) {
   $fh = @fopen(POW_SPENT_FILE, 'c+');
   if (!$fh) return true;
