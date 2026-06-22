@@ -106,7 +106,8 @@ if (!pow_verify(pval('challenge'), pval('sig'), pval('nonce')) || !pow_spend(pva
   $p = challenge_json();
   $p['need_proof'] = true;
   $p['howto']      = 'Find nonce per "formula", then re-POST this form (name,email,message) '
-                   . 'with challenge and sig unchanged plus your nonce.';
+                   . 'with challenge and sig unchanged plus your nonce. This challenge is valid '
+                   . 'until "expires_at" (unix seconds); reuse it until then, after which request a new one.';
   logrec('c', 'challenge-issued');
   echo json_encode($p, JSON_UNESCAPED_SLASHES);
   exit;
@@ -168,16 +169,24 @@ function pow_target() { return (2 ** (32 - POW_BITS)) - 1; }
 
 function pow_sign($challenge, $key) { return hash_hmac('sha256', $challenge, $key); }
 
-/* Issue a fresh, signed challenge: array{challenge, sig, target, bits} or null. */
+/* Issue a fresh, signed challenge: array{challenge, sig, target, bits,
+   issued_at, expires_at, ttl} or null. issued_at/expires_at/ttl state the
+   validity window explicitly so a client need not guess what the timestamp in
+   "challenge" means (it is the issue time). They are advisory - verification
+   enforces the window itself - so they are not part of the signed challenge. */
 function pow_issue() {
   $key = pow_secret();
   if ($key === '') return null;
-  $challenge = bin2hex(random_bytes(8)) . ':' . time();   // random : unix-time
+  $now = time();
+  $challenge = bin2hex(random_bytes(8)) . ':' . $now;   // random : unix-time
   return array(
-    'challenge' => $challenge,
-    'sig'       => pow_sign($challenge, $key),
-    'target'    => pow_target(),
-    'bits'      => POW_BITS,
+    'challenge'  => $challenge,
+    'sig'        => pow_sign($challenge, $key),
+    'target'     => pow_target(),
+    'bits'       => POW_BITS,
+    'issued_at'  => $now,
+    'expires_at' => $now + POW_WINDOW,
+    'ttl'        => POW_WINDOW,
   );
 }
 

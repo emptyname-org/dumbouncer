@@ -47,7 +47,10 @@ Example challenge:
   "challenge": "9f3a...:1781785223",
   "sig": "hmac-sha256(challenge)",
   "target": 4095,
-  "bits": 20
+  "bits": 20,
+  "issued_at": 1781785223,
+  "expires_at": 1781785523,
+  "ttl": 300
 }
 ```
 
