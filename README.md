@@ -54,14 +54,22 @@ client reads the sentence.
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Demo contact form |
-| `script.js` | Browser proof-of-work solver (synchronous SHA-256) |
+| `index.html` | Demo contact form (loads `script.min.js`) |
+| `script.js` | Browser proof-of-work solver, readable source (synchronous SHA-256) |
+| `script.min.js` | Minified, comment-stripped solver - **the file the page loads; deploy this one, not `script.js`** |
 | `style.css` | Demo styling (replace with your own) |
 | `message.php` | Form handler and proof-of-work logic |
 
 `message.php` is self-contained: proof issuing, verification, replay protection,
 and configuration all live in the same file, so there is no other PHP to
 include.
+
+Ship the minified solver, not the commented source - it avoids handing a reader
+the whole protocol. Rebuild it after editing `script.js`:
+
+```sh
+npx terser script.js -c -m -o script.min.js
+```
 
 ## Install
 
