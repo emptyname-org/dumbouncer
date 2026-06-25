@@ -153,7 +153,6 @@
     }
     busy = true; form.classList.add("disabled");
     startDots("Sending", "#0a0");
-    setField("j", "1");   // marks the browser path in the log; an agent following the prose omits it
     post(true);
   });
 })();

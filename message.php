@@ -70,9 +70,6 @@ function logrec($code, $reason) {
     'ip'     => $_SERVER['REMOTE_ADDR'] ?? '',
     'code'   => $code,
     'reason' => $reason,
-    // human = our script.js ran (it stamps j); agent = a client that followed the
-    // prose, which never mentions j. A clean "did our JS run" signal, no headers.
-    'route'  => empty($_POST['j']) ? 'agent' : 'human',
     'name'   => substr(pval('name'), 0, 120),
     'email'  => substr(pval('email'), 0, 200),
     'ua'     => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 200),
